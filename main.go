@@ -11,10 +11,12 @@ import (
 	// "os"
 	// "strings"
 	// "github.com/charmbracelet/bubbles/textinput"
-	"github.com/charmbracelet/bubbles/progress"
+	"github.com/charmbracelet/bubbles/key"
+	// "github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	// "github.com/charmbracelet/lipgloss"
+	"goNotes/keymaps"
 )
 
 const (
@@ -25,9 +27,11 @@ const (
 type errMsg error
 
 type tickMsg time.Time
+
 type model struct {
-	err      error
-	progress progress.Model
+	err    error
+	keymap keymaps.KeyMap
+	// progress progress.Model
 	spinner  spinner.Model
 	quitting bool
 }
@@ -38,6 +42,7 @@ func initialModel() model {
 	//spinner
 	s := spinner.New()
 	s.Spinner = spinner.Dot
+
 	return model{spinner: s}
 }
 
@@ -50,10 +55,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "q", "esc", "ctrl+c":
+		switch {
+		case key.Matches(msg, m.keymap.Quit):
+			fmt.Printf("%s", msg)
 			m.quitting = true
 			return m, tea.Quit
+
 		default:
 			return m, nil
 		}
