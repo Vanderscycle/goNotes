@@ -13,44 +13,42 @@ import (
 	// "github.com/charmbracelet/bubbles/textinput"
 	// "github.com/charmbracelet/bubbles/progress"
 	// "github.com/charmbracelet/lipgloss"
+	"goNotes/keymaps"
+
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
-	"goNotes/keymaps"
+	"github.com/charmbracelet/lipgloss"
 )
 
-const (
-	padding  = 2
-	maxWidth = 80
-)
+// const listHeight Int = 14
+
+var docStyle = lipgloss.NewStyle().Margin(1, 2)
+
+type item struct {
+	title string
+	desc  string
+}
+
+func (i item) Title() string       { return i.title }
+func (i item) Description() string { return i.desc }
+func (i item) FilterValue() string { return i.title }
 
 type errMsg error
 
 type tickMsg time.Time
 
+//tea model
 type model struct {
-	err    error
-	keymap keymaps.KeyMap
-	// progress progress.Model
+	keymap   keymaps.KeyMap
+	list     list.Model
+	err      error
 	spinner  spinner.Model
 	quitting bool
 }
 
-func initialModel() model {
-	//progess bar
-
-	//spinner
-	s := spinner.New()
-	s.Spinner = spinner.Dot
-
-	return model{spinner: s, keymap: keymaps.DefaultKeyMap}
-}
-
-func (m model) Init() tea.Cmd {
-	// Just return `nil`, which means "no I/O right now, please."
-	return m.spinner.Tick
-}
-
+//update
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
@@ -76,6 +74,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 
+	case tea.WindowSizeMsg:
+		h, v := docStyle.GetFrameSize()
+		m.list.SetSize(msg.Width-h, msg.Height-v)
+		var cmd tea.Cmd
+		m.list, cmd = m.list.Update(msg)
+		return m, cmd
+
 	case errMsg:
 		m.err = msg
 		return m, nil
@@ -87,6 +92,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
+//view
 func (m model) View() string {
 	if m.err != nil {
 		return m.err.Error()
@@ -95,7 +101,32 @@ func (m model) View() string {
 	if m.quitting {
 		return str + "\n"
 	}
+	//TODO: key detection and state management e.g. if user press ? then we show a list of all cmd, if he press
+	//  else {
+	// 	return docStyle.Render(m.list.View())
+	// }
+
 	return str
+}
+
+func (m model) Init() tea.Cmd {
+	// Just return `nil`, which means "no I/O right now, please."
+	m.list.Title = "My Fave Things"
+	return m.spinner.Tick
+}
+
+func initialModel() model {
+	//cmd list
+	cmds := []list.Item{
+		item{title: "Raspberry Pi’s", desc: "I have ’em all over my house"},
+		item{title: "Nutella", desc: "It's good on toast"},
+	}
+
+	//spinner
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+
+	return model{spinner: s, keymap: keymaps.DefaultKeyMap, list: list.New(cmds, list.NewDefaultDelegate(), 0, 0)}
 }
 
 func main() {

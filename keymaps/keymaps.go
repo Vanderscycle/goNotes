@@ -3,9 +3,10 @@ package keymaps
 import "github.com/charmbracelet/bubbles/key"
 
 type KeyMap struct {
-	Up   key.Binding
-	Down key.Binding
-	Quit key.Binding
+	Up    key.Binding
+	Down  key.Binding
+	Quit  key.Binding
+	Enter key.Binding
 }
 
 var DefaultKeyMap = KeyMap{
@@ -21,4 +22,5 @@ var DefaultKeyMap = KeyMap{
 		key.WithKeys("q", "esc", "ctr+c"),
 		key.WithHelp("esq", "quit"),
 	),
+	Enter: key.NewBinding(key.WithKeys("enter"), key.WithHelp("enter", "select")),
 }
