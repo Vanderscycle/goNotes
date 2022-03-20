@@ -7,6 +7,7 @@ type KeyMap struct {
 	Down  key.Binding
 	Quit  key.Binding
 	Enter key.Binding
+	State key.Binding
 }
 
 var DefaultKeyMap = KeyMap{
@@ -23,4 +24,5 @@ var DefaultKeyMap = KeyMap{
 		key.WithHelp("esq", "quit"),
 	),
 	Enter: key.NewBinding(key.WithKeys("enter"), key.WithHelp("enter", "select")),
+	State: key.NewBinding(key.WithKeys("s"), key.WithHelp("s", "change the state of the app")),
 }

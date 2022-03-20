@@ -23,6 +23,7 @@ import (
 )
 
 // const listHeight Int = 14
+var state = []string{"list", "wait"}
 
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
@@ -42,9 +43,10 @@ type tickMsg time.Time
 //tea model
 type model struct {
 	keymap   keymaps.KeyMap
-	list     list.Model
 	err      error
+	state    string
 	spinner  spinner.Model
+	list     list.Model
 	quitting bool
 }
 
@@ -58,7 +60,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			msg2 := "quit"
 			fmt.Println("%s", msg2)
 			m.quitting = true
-			os.Exit(1)
+			// os.Exit(1)
 			return m, tea.Quit
 
 		case key.Matches(msg, m.keymap.Down):
@@ -68,7 +70,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.Up):
 			fmt.Printf("up")
 			return m, nil
-
+		case key.Matches(msg, m.keymap.State):
+			oldState := m.state
+			switch m.state {
+			case "home":
+				m.state = "cmd"
+			case "cmd":
+				m.state = "home"
+			}
+			fmt.Printf("State change; previous %s, new: %s", oldState, m.state)
+			return m, nil
 		default:
 			// fmt.Printf("%s && %v", msg, key.Matches(msg, m.keymap.Quit))
 			return m, nil
@@ -98,6 +109,12 @@ func (m model) View() string {
 		return m.err.Error()
 	}
 	str := fmt.Sprintf("\n\n   %s Loading forever...press q to quit\n\n", m.spinner.View())
+	switch m.state {
+	case "home":
+		return str
+	case "cmd":
+		return docStyle.Render(m.list.View())
+	}
 	if m.quitting {
 		return str + "\n"
 	}
@@ -106,7 +123,7 @@ func (m model) View() string {
 	// 	return docStyle.Render(m.list.View())
 	// }
 
-	return str
+	return "waiting"
 }
 
 func (m model) Init() tea.Cmd {
@@ -126,12 +143,11 @@ func initialModel() model {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
 
-	return model{spinner: s, keymap: keymaps.DefaultKeyMap, list: list.New(cmds, list.NewDefaultDelegate(), 0, 0)}
+	return model{spinner: s, keymap: keymaps.DefaultKeyMap, list: list.New(cmds, list.NewDefaultDelegate(), 0, 0), state: "home"}
 }
 
 func main() {
 
-	fmt.Printf("hello %s", "test")
 	p := tea.NewProgram(initialModel())
 	if err := p.Start(); err != nil {
 		fmt.Println(err)
