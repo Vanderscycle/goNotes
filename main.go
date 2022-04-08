@@ -76,7 +76,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fmt.Printf("up")
 				m.list.CursorUp()
 			}
+			return m, nil
 
+		case key.Matches(msg, m.keymap.Search):
+			if m.state == "cmd" {
+				fmt.Printf("search")
+				v := !m.list.ShowTitle()
+				m.list.SetShowTitle(v)
+				m.list.SetShowFilter(v)
+				m.list.SetFilteringEnabled(v)
+			}
+			return m, nil
+
+		case key.Matches(msg, m.keymap.Help):
+			m.list.SetShowHelp(!m.list.ShowHelp())
 			return m, nil
 
 		case key.Matches(msg, m.keymap.State):
