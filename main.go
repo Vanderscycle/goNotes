@@ -67,12 +67,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.Down):
 			if m.state == "cmd" {
 				fmt.Printf("Down")
+				m.list.CursorDown()
 			}
 			return m, nil
 
 		case key.Matches(msg, m.keymap.Up):
 			if m.state == "cmd" {
 				fmt.Printf("up")
+				m.list.CursorUp()
 			}
 
 			return m, nil
