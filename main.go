@@ -56,6 +56,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch {
+
 		case key.Matches(msg, m.keymap.Quit):
 			msg2 := "quit"
 			fmt.Println("%s", msg2)
@@ -64,17 +65,25 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case key.Matches(msg, m.keymap.Down):
-			fmt.Printf("Down")
+			if m.state == "cmd" {
+				fmt.Printf("Down")
+			}
 			return m, nil
 
 		case key.Matches(msg, m.keymap.Up):
-			fmt.Printf("up")
+			if m.state == "cmd" {
+				fmt.Printf("up")
+			}
+
 			return m, nil
+
 		case key.Matches(msg, m.keymap.State):
 			oldState := m.state
 			switch m.state {
 			case "home":
 				m.state = "cmd"
+			case "loading":
+				m.state = "cmd" //not specific
 			case "cmd":
 				m.state = "home"
 			}
@@ -109,8 +118,11 @@ func (m model) View() string {
 		return m.err.Error()
 	}
 	str := fmt.Sprintf("\n\n   %s Loading forever...press q to quit\n\n", m.spinner.View())
+	str2 := "Home screet for task warrior"
 	switch m.state {
 	case "home":
+		return str2
+	case "loading":
 		return str
 	case "cmd":
 		return docStyle.Render(m.list.View())
