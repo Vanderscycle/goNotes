@@ -2,7 +2,7 @@
 
 ## Description
 
-A Go wrapper around TaskWarrior cli.
+A Go wrapper around [ TaskWarrior ](https://taskwarrior.org/) cli.
 ## Key libraries
 
 * [ bubbles ](https://github.com/charmbracelet/bubbles) as TUI component lib
