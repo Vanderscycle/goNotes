@@ -8,12 +8,8 @@ import (
 	"os"
 	"time"
 
-	// "os"
-	// "strings"
-	// "github.com/charmbracelet/bubbles/textinput"
-	// "github.com/charmbracelet/bubbles/progress"
-	// "github.com/charmbracelet/lipgloss"
 	"goNotes/keymaps"
+	taskwarrior "goNotes/taskWarrior"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -23,18 +19,9 @@ import (
 )
 
 // const listHeight Int = 14
-var state = []string{"list", "wait"}
+var state = []string{"cmd", "home", "loading"}
 
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
-
-type item struct {
-	title string
-	desc  string
-}
-
-func (i item) Title() string       { return i.title }
-func (i item) Description() string { return i.desc }
-func (i item) FilterValue() string { return i.title }
 
 type errMsg error
 
@@ -160,17 +147,11 @@ func (m model) Init() tea.Cmd {
 }
 
 func initialModel() model {
-	//cmd list
-	cmds := []list.Item{
-		item{title: "Raspberry Pi’s", desc: "I have ’em all over my house"},
-		item{title: "Nutella", desc: "It's good on toast"},
-	}
-
 	//spinner
 	s := spinner.New()
 	s.Spinner = spinner.Dot
 
-	return model{spinner: s, keymap: keymaps.DefaultKeyMap, list: list.New(cmds, list.NewDefaultDelegate(), 0, 0), state: "home"}
+	return model{spinner: s, keymap: keymaps.DefaultKeyMap, list: list.New(taskwarrior.Cmds, list.NewDefaultDelegate(), 0, 0), state: "home"}
 }
 
 func main() {
