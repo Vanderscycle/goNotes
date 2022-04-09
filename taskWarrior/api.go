@@ -1,6 +1,7 @@
 package taskwarrior
 
 import (
+	"log"
 	"os"
 	"os/exec"
 	"syscall"
@@ -26,16 +27,17 @@ var Cmds = []list.Item{
 	Command{title: "delete", desc: "delete's a task"}, //need to pass a value
 }
 
-func Api() {
-	userInput := "captuire the user input in bubbleTea"
+func Api(c *Command) {
+	userInput := "capture the user input in bubbleTea"
 	binary, lookErr := exec.LookPath(TaskArg)
 	if lookErr != nil {
+		log.Fatal("TaskWarrior not installed")
 		panic(lookErr)
 	}
 
 	env := os.Environ()
 
-	args := []string{TaskArg, "add", userInput}
+	args := []string{TaskArg, c.Title(), userInput}
 	execErr := syscall.Exec(binary, args, env)
 	if execErr != nil {
 		panic(execErr)
