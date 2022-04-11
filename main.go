@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"goNotes/keymaps"
+	indexPage "goNotes/routes"
 	taskwarrior "goNotes/taskWarrior"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -20,7 +21,6 @@ import (
 
 // const listHeight Int = 14
 var state = []string{"cmd", "home", "loading"}
-
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type errMsg error
@@ -41,7 +41,7 @@ type model struct {
 func (m model) Init() tea.Cmd {
 	// Just return `nil`, which means "no I/O right now, please."
 	m.list.Title = "My Fave Things"
-	return tea.Batch(m.spinner.Tick)
+	return tea.Batch(m.spinner.Tick, m.index.Init())
 }
 
 //update
@@ -127,10 +127,9 @@ func (m model) View() string {
 		return m.err.Error()
 	}
 	str := fmt.Sprintf("\n\n   %s Loading forever...press q to quit\n\n", m.spinner.View())
-	str2 := "work on the views Henri"
 	switch m.state {
 	case "home":
-		return str2
+		return m.index.View()
 	case "loading":
 		return str
 	case "cmd":
@@ -152,7 +151,15 @@ func initialModel() model {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
 
-	return model{spinner: s, keymap: keymaps.DefaultKeyMap, list: list.New(taskwarrior.Cmds, list.NewDefaultDelegate(), 0, 0), state: "home"}
+	return model{
+		index:    indexPage.PageInitialModel(),
+		keymap:   keymaps.DefaultKeyMap,
+		err:      nil,
+		state:    "home",
+		spinner:  s,
+		list:     list.New(taskwarrior.Cmds, list.NewDefaultDelegate(), 0, 0),
+		quitting: false,
+	}
 }
 
 func main() {
