@@ -6,7 +6,7 @@
 - [ ] learn about channels and/or tea.KeyMsg 
 
 ## Bugs
-- [ ] 
+- [ ] when searching through the telescope list 
 
 ## Description
 

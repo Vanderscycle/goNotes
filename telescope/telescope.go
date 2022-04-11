@@ -13,7 +13,10 @@ import (
 )
 
 var (
-	title     = lipgloss.NewStyle().Align(lipgloss.Center).Padding(2)
+	title = lipgloss.NewStyle().
+		Align(lipgloss.Center).
+		Padding(2).
+		Foreground(lipgloss.Color("170"))
 	paragraph = lipgloss.NewStyle().
 			Align(lipgloss.Center).
 			BorderStyle(lipgloss.NormalBorder()).
@@ -23,23 +26,28 @@ var (
 
 type Page struct {
 	keymap    keymaps.KeyMap
-	title     string
 	paragraph string
 	list      list.Model
 	searching bool
 }
 
 func PageInitialModel() Page {
+	l := list.New(taskwarrior.Cmds, list.NewDefaultDelegate(), 0, 0)
+	l.Styles.Title = title
+	l.Title = "commands"
+
 	return Page{
-		title:     "commands",
 		paragraph: "Go",
-		list:      list.New(taskwarrior.Cmds, list.NewDefaultDelegate(), 0, 0),
+		list:      l,
 		keymap:    keymaps.DefaultKeyMap,
 		searching: false}
 }
 
 func (m Page) Init() tea.Cmd {
 	// Initialize sub-models
+	//TODO: css
+	// l.Styles.PaginationStyle = paginationStyle
+	// l.Styles.HelpStyle = helpStyle
 	return tea.EnterAltScreen
 }
 

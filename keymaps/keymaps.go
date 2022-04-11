@@ -11,6 +11,7 @@ type KeyMap struct {
 	Search key.Binding
 	Help   key.Binding
 	Status key.Binding
+	Select key.Binding
 }
 
 var DefaultKeyMap = KeyMap{
@@ -31,4 +32,5 @@ var DefaultKeyMap = KeyMap{
 	Search: key.NewBinding(key.WithKeys("/"), key.WithHelp("/", "search")),
 	Help:   key.NewBinding(key.WithKeys("h"), key.WithHelp("h", "display hides the help menu")),
 	Status: key.NewBinding(key.WithKeys("S"), key.WithHelp("S", "display hides the status")),
+	Select: key.NewBinding(key.WithKeys("enter"), key.WithHelp("Enter", "Select the current item")),
 }
