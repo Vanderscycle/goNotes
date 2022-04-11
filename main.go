@@ -29,12 +29,19 @@ type tickMsg time.Time
 
 //tea model
 type model struct {
+	index    tea.Model
 	keymap   keymaps.KeyMap
 	err      error
 	state    string
 	spinner  spinner.Model
 	list     list.Model
 	quitting bool
+}
+
+func (m model) Init() tea.Cmd {
+	// Just return `nil`, which means "no I/O right now, please."
+	m.list.Title = "My Fave Things"
+	return tea.Batch(m.spinner.Tick)
 }
 
 //update
@@ -120,7 +127,7 @@ func (m model) View() string {
 		return m.err.Error()
 	}
 	str := fmt.Sprintf("\n\n   %s Loading forever...press q to quit\n\n", m.spinner.View())
-	str2 := "Home screet for task warrior"
+	str2 := "work on the views Henri"
 	switch m.state {
 	case "home":
 		return str2
@@ -138,12 +145,6 @@ func (m model) View() string {
 	// }
 
 	return "waiting"
-}
-
-func (m model) Init() tea.Cmd {
-	// Just return `nil`, which means "no I/O right now, please."
-	m.list.Title = "My Fave Things"
-	return m.spinner.Tick
 }
 
 func initialModel() model {

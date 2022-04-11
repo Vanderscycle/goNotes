@@ -1,5 +1,9 @@
 # Go Notes
 
+## TODO
+
+- [ ] create and  transform the program into subcomponents (kinda like svelte) check this [ discussion ]( https://github.com/charmbracelet/bubbletea/discussions/176)
+
 ## Description
 
 A Go wrapper around [ TaskWarrior ](https://taskwarrior.org/) cli.
@@ -13,3 +17,5 @@ A Go wrapper around [ TaskWarrior ](https://taskwarrior.org/) cli.
 ## Neat TUI examples
 
 * [ Slides ](https://github.com/maaslalani/slides)
+
+
