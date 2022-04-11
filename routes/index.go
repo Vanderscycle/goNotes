@@ -34,6 +34,6 @@ func (m Page) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Page) View() string {
-	s := lipgloss.JoinHorizontal(.2, title.Render(m.title), paragraph.Render(m.paragraph))
+	s := lipgloss.JoinVertical(lipgloss.Center, title.Render(m.title), paragraph.Render(m.paragraph))
 	return s
 }
