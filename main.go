@@ -14,7 +14,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -33,19 +32,20 @@ type model struct {
 	keymap   keymaps.KeyMap
 	err      error
 	state    string
-	spinner  spinner.Model
 	list     list.Model
 	quitting bool
 }
 
 func (m model) Init() tea.Cmd {
-	// Just return `nil`, which means "no I/O right now, please."
-	m.list.Title = "My Fave Things"
-	return tea.Batch(m.spinner.Tick, m.index.Init())
+	return tea.Batch(m.index.Init())
 }
 
 //update
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var (
+		cmd  tea.Cmd
+		cmds []tea.Cmd
+	)
 	switch msg := msg.(type) {
 
 	case tea.KeyMsg:
@@ -58,19 +58,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// os.Exit(1)
 			return m, tea.Quit
 
-		case key.Matches(msg, m.keymap.Down):
-			if m.state == "cmd" {
-				fmt.Printf("Down")
-				m.list.CursorDown()
-			}
-			return m, nil
+		// case key.Matches(msg, m.keymap.Down):
+		// 	if m.state == "cmd" {
+		// 		m.list.CursorDown()
+		// 	}
+		// 	return m, nil
 
-		case key.Matches(msg, m.keymap.Up):
-			if m.state == "cmd" {
-				fmt.Printf("up")
-				m.list.CursorUp()
-			}
-			return m, nil
+		// case key.Matches(msg, m.keymap.Up):
+		// 	if m.state == "cmd" {
+		// 		m.list.CursorUp()
+		// 	}
+		// 	return m, nil
 
 		case key.Matches(msg, m.keymap.Search):
 			if m.state == "cmd" {
@@ -98,15 +96,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			fmt.Printf("State change; previous %s, new: %s", oldState, m.state)
 			return m, nil
-		default:
-			// fmt.Printf("%s && %v", msg, key.Matches(msg, m.keymap.Quit))
-			return m, nil
 		}
 
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
-		var cmd tea.Cmd
 		m.list, cmd = m.list.Update(msg)
 		return m, cmd
 
@@ -115,48 +109,41 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	default:
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
-		return m, cmd
+		m.index, cmd = m.index.Update(msg)
+		cmds = append(cmds, cmd)
+
+		return m, tea.Batch(cmds...)
 	}
+	return m, nil
 }
 
 //view
 func (m model) View() string {
 	if m.err != nil {
+		//TODO: catch the error , display and return to the home screen
 		return m.err.Error()
 	}
-	str := fmt.Sprintf("\n\n   %s Loading forever...press q to quit\n\n", m.spinner.View())
-	switch m.state {
-	case "home":
-		return m.index.View()
-	case "loading":
-		return str
-	case "cmd":
-		return docStyle.Render(m.list.View())
-	}
+	str := fmt.Sprintf("[MSG]: %s", "Quitting but turn this into a func? with log warning/or get a logger")
 	if m.quitting {
 		return str + "\n"
 	}
-	//TODO: key detection and state management e.g. if user press ? then we show a list of all cmd, if he press
-	//  else {
-	// 	return docStyle.Render(m.list.View())
-	// }
 
+	switch m.state {
+	case "home":
+		return m.index.View()
+	case "cmd":
+		return docStyle.Render(m.list.View())
+	}
 	return "waiting"
 }
 
 func initialModel() model {
-	//spinner
-	s := spinner.New()
-	s.Spinner = spinner.Dot
 
 	return model{
 		index:    indexPage.PageInitialModel(),
 		keymap:   keymaps.DefaultKeyMap,
 		err:      nil,
 		state:    "home",
-		spinner:  s,
 		list:     list.New(taskwarrior.Cmds, list.NewDefaultDelegate(), 0, 0),
 		quitting: false,
 	}

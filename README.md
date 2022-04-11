@@ -3,7 +3,7 @@
 ## TODO
 
 - [ ] create and  transform the program into subcomponents (kinda like svelte) check this [ discussion ]( https://github.com/charmbracelet/bubbletea/discussions/176)
-
+- [ ] learn about channels and/or tea.KeyMsg 
 ## Description
 
 A Go wrapper around [ TaskWarrior ](https://taskwarrior.org/) cli.
