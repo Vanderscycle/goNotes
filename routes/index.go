@@ -1,9 +1,7 @@
 package indexPage
 
 import (
-	"fmt"
 	"goNotes/keymaps"
-	"log"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -46,12 +44,12 @@ func (m Page) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, m.keymap.Down):
 			m.keyPressed = "down"
-			fmt.Print(m.keyPressed)
+			// fmt.Print(m.keyPressed)
 			return m, nil
 
 		case key.Matches(msg, m.keymap.Up):
 			m.keyPressed = "up"
-			log.Print(m.keyPressed)
+			// log.Print(m.keyPressed)
 			return m, nil
 		}
 	}
@@ -60,6 +58,7 @@ func (m Page) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Page) View() string {
-	s := lipgloss.JoinVertical(lipgloss.Center, title.Render(m.title), paragraph.Render(m.paragraph), lipgloss.NewStyle().Render(m.keyPressed))
+	s := lipgloss.JoinVertical(lipgloss.Center, title.Render(m.title), paragraph.Render(m.paragraph))
+	s += lipgloss.NewStyle().Render(m.keyPressed)
 	return s
 }

@@ -56,7 +56,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			fmt.Println("%s", msg2)
 			m.quitting = true
 			// os.Exit(1)
-			return m, tea.Quit
+			cmds = append(cmds, tea.Quit)
 
 		// case key.Matches(msg, m.keymap.Down):
 		// 	if m.state == "cmd" {
@@ -85,7 +85,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 
 		case key.Matches(msg, m.keymap.State):
-			oldState := m.state
 			switch m.state {
 			case "home":
 				m.state = "cmd"
@@ -94,7 +93,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "cmd":
 				m.state = "home"
 			}
-			fmt.Printf("State change; previous %s, new: %s", oldState, m.state)
 			return m, nil
 		}
 
@@ -107,14 +105,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case errMsg:
 		m.err = msg
 		return m, nil
-
-	default:
-		m.index, cmd = m.index.Update(msg)
-		cmds = append(cmds, cmd)
-
-		return m, tea.Batch(cmds...)
 	}
-	return m, nil
+
+	m.index, cmd = m.index.Update(msg)
+	cmds = append(cmds, cmd)
+
+	return m, tea.Batch(cmds...)
 }
 
 //view
