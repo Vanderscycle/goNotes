@@ -5,6 +5,8 @@ package indexPage
 // figureout how to use github imports
 import (
 	"goNotes/keymaps"
+	taskwarrior "goNotes/taskWarrior"
+	"log"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -24,14 +26,23 @@ type Page struct {
 	title      string
 	paragraph  string
 	keyPressed string
+	// command    taskwarrior.Command
 }
 
 func PageInitialModel() Page {
+	defaultList := taskwarrior.Cmds[1]
+	// defaultListDisplay, err := taskwarrior.Api(defaultList)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	log.Print(defaultList)
 	return Page{
 		keymap:     keymaps.DefaultKeyMap,
 		title:      "Go Notes",
 		paragraph:  "Go TUI build using skate.sh tools to wrap around Task Warrior excellent CLI",
-		keyPressed: ""}
+		keyPressed: "",
+		// command:    defaultList}
+	}
 }
 
 func (m Page) Init() tea.Cmd {
@@ -63,5 +74,6 @@ func (m Page) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Page) View() string {
 	s := lipgloss.JoinVertical(lipgloss.Center, title.Render(m.title), paragraph.Render(m.paragraph))
 	s += lipgloss.NewStyle().Render(m.keyPressed)
+	s += lipgloss.NewStyle().Render(taskwarrior.Cmds[1].FilterValue())
 	return s
 }

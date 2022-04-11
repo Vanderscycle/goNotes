@@ -27,7 +27,7 @@ var Cmds = []list.Item{
 	Command{title: "delete", desc: "delete's a task"}, //need to pass a value
 }
 
-func Api(c *Command) {
+func Api(c Command) (string, error) {
 	userInput := "capture the user input in bubbleTea"
 	binary, lookErr := exec.LookPath(TaskArg)
 	if lookErr != nil {
@@ -42,4 +42,5 @@ func Api(c *Command) {
 	if execErr != nil {
 		panic(execErr)
 	}
+	return "??", nil
 }
