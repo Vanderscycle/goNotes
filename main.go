@@ -11,17 +11,14 @@ import (
 
 	"goNotes/keymaps"
 	indexPage "goNotes/routes"
-	taskwarrior "goNotes/taskWarrior"
+	"goNotes/telescope"
 
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 // const listHeight Int = 14
-var state = []string{"cmd", "home", "loading"}
-var docStyle = lipgloss.NewStyle().Margin(1, 2)
+var state = []string{"cmd", "home"}
 
 type errMsg error
 
@@ -29,16 +26,16 @@ type tickMsg time.Time
 
 //tea model
 type model struct {
-	index    tea.Model
 	keymap   keymaps.KeyMap
+	index    tea.Model
 	err      error
+	list     tea.Model
 	state    string
-	list     list.Model
 	quitting bool
 }
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(m.index.Init())
+	return tea.Batch(m.index.Init(), m.list.Init())
 }
 
 //update
@@ -59,32 +56,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// os.Exit(1)
 			cmds = append(cmds, tea.Quit)
 
-		// case key.Matches(msg, m.keymap.Down):
-		// 	if m.state == "cmd" {
-		// 		m.list.CursorDown()
-		// 	}
-		// 	return m, nil
-
-		// case key.Matches(msg, m.keymap.Up):
-		// 	if m.state == "cmd" {
-		// 		m.list.CursorUp()
-		// 	}
-		// 	return m, nil
-
-		case key.Matches(msg, m.keymap.Search):
-			if m.state == "cmd" {
-				fmt.Printf("search")
-				v := !m.list.ShowTitle()
-				m.list.SetShowTitle(v)
-				m.list.SetShowFilter(v)
-				m.list.SetFilteringEnabled(v)
-			}
-			return m, nil
-
-		case key.Matches(msg, m.keymap.Help):
-			m.list.SetShowHelp(!m.list.ShowHelp())
-			return m, nil
-
 		case key.Matches(msg, m.keymap.State):
 			switch m.state {
 			case "home":
@@ -97,18 +68,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 
-	case tea.WindowSizeMsg:
-		h, v := docStyle.GetFrameSize()
-		m.list.SetSize(msg.Width-h, msg.Height-v)
-		m.list, cmd = m.list.Update(msg)
-		return m, cmd
-
 	case errMsg:
 		m.err = msg
 		return m, nil
 	}
 
 	m.index, cmd = m.index.Update(msg)
+	cmds = append(cmds, cmd)
+	m.list, cmd = m.list.Update(msg)
 	cmds = append(cmds, cmd)
 
 	return m, tea.Batch(cmds...)
@@ -129,7 +96,7 @@ func (m model) View() string {
 	case "home":
 		return m.index.View()
 	case "cmd":
-		return docStyle.Render(m.list.View())
+		return m.list.View()
 	}
 	return "waiting"
 }
@@ -141,7 +108,7 @@ func initialModel() model {
 		keymap:   keymaps.DefaultKeyMap,
 		err:      nil,
 		state:    "home",
-		list:     list.New(taskwarrior.Cmds, list.NewDefaultDelegate(), 0, 0),
+		list:     telescope.PageInitialModel(),
 		quitting: false,
 	}
 }
