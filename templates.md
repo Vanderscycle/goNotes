@@ -1,17 +1,10 @@
+# Templates 
+
+## Simple component page
+```go
 package indexPage
 
-import (
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-)
-
-var (
-	title     = lipgloss.NewStyle().Align(lipgloss.Center).Padding(2)
-	paragraph = lipgloss.NewStyle().
-			Align(lipgloss.Center).
-			BorderStyle(lipgloss.NormalBorder()).
-			BorderForeground(lipgloss.Color("63")).Padding(2)
-)
+import tea "github.com/charmbracelet/bubbletea"
 
 type Page struct {
 	title     string
@@ -34,6 +27,9 @@ func (m Page) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Page) View() string {
-	s := lipgloss.JoinHorizontal(.2, title.Render(m.title), paragraph.Render(m.paragraph))
+	s := m.title
+	s += m.paragraph
 	return s
 }
+
+```
