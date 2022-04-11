@@ -1,5 +1,8 @@
 package indexPage
 
+//figure out how to use sub directories as I want to have more than one route
+//https://stackoverflow.com/questions/24763347/golang-subdirectories
+// figureout how to use github imports
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"

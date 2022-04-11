@@ -3,6 +3,7 @@ package main
 // A simple example demonstrating the use of multiple text input components
 // from the Bubbles component library.
 
+// we will need to use channels (to check the state of the app)
 import (
 	"fmt"
 	"os"
@@ -57,34 +58,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			// os.Exit(1)
 			return m, tea.Quit
-
-		case key.Matches(msg, m.keymap.Down):
-			if m.state == "cmd" {
-				fmt.Printf("Down")
-				m.list.CursorDown()
-			}
-			return m, nil
-
-		case key.Matches(msg, m.keymap.Up):
-			if m.state == "cmd" {
-				fmt.Printf("up")
-				m.list.CursorUp()
-			}
-			return m, nil
-
-		case key.Matches(msg, m.keymap.Search):
-			if m.state == "cmd" {
-				fmt.Printf("search")
-				v := !m.list.ShowTitle()
-				m.list.SetShowTitle(v)
-				m.list.SetShowFilter(v)
-				m.list.SetFilteringEnabled(v)
-			}
-			return m, nil
-
-		case key.Matches(msg, m.keymap.Help):
-			m.list.SetShowHelp(!m.list.ShowHelp())
-			return m, nil
 
 		case key.Matches(msg, m.keymap.State):
 			oldState := m.state
