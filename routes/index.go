@@ -4,6 +4,9 @@ package indexPage
 //https://stackoverflow.com/questions/24763347/golang-subdirectories
 // figureout how to use github imports
 import (
+	"goNotes/keymaps"
+
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -17,14 +20,18 @@ var (
 )
 
 type Page struct {
-	title     string
-	paragraph string
+	keymap     keymaps.KeyMap
+	title      string
+	paragraph  string
+	keyPressed string
 }
 
 func PageInitialModel() Page {
 	return Page{
-		title:     "Go Notes",
-		paragraph: "Go TUI build using skate.sh tools to wrap around Task Warrior excellent CLI"}
+		keymap:     keymaps.DefaultKeyMap,
+		title:      "Go Notes",
+		paragraph:  "Go TUI build using skate.sh tools to wrap around Task Warrior excellent CLI",
+		keyPressed: ""}
 }
 
 func (m Page) Init() tea.Cmd {
@@ -33,10 +40,28 @@ func (m Page) Init() tea.Cmd {
 }
 
 func (m Page) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+
+	case tea.KeyMsg:
+		switch {
+
+		case key.Matches(msg, m.keymap.Down):
+			m.keyPressed = "down"
+			// fmt.Print(m.keyPressed)
+			return m, nil
+
+		case key.Matches(msg, m.keymap.Up):
+			m.keyPressed = "up"
+			// log.Print(m.keyPressed)
+			return m, nil
+		}
+	}
 	return m, nil
+
 }
 
 func (m Page) View() string {
 	s := lipgloss.JoinVertical(lipgloss.Center, title.Render(m.title), paragraph.Render(m.paragraph))
+	s += lipgloss.NewStyle().Render(m.keyPressed)
 	return s
 }
