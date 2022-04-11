@@ -4,9 +4,14 @@
 
 - [ ] create and  transform the program into subcomponents (kinda like svelte) check this [ discussion ]( https://github.com/charmbracelet/bubbletea/discussions/176)
 - [ ] learn about channels and/or tea.KeyMsg 
+
+## Bugs
+- [ ] 
+
 ## Description
 
 A Go wrapper around [ TaskWarrior ](https://taskwarrior.org/) cli.
+
 ## Key libraries
 
 * [ bubbles ](https://github.com/charmbracelet/bubbles) as TUI component lib

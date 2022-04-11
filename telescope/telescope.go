@@ -4,6 +4,7 @@ package telescope
 import (
 	"goNotes/keymaps"
 	taskwarrior "goNotes/taskWarrior"
+	"log"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -25,6 +26,7 @@ type Page struct {
 	title     string
 	paragraph string
 	list      list.Model
+	searching bool
 }
 
 func PageInitialModel() Page {
@@ -33,21 +35,34 @@ func PageInitialModel() Page {
 		paragraph: "Go",
 		list:      list.New(taskwarrior.Cmds, list.NewDefaultDelegate(), 0, 0),
 		keymap:    keymaps.DefaultKeyMap,
-	}
+		searching: false}
 }
 
 func (m Page) Init() tea.Cmd {
 	// Initialize sub-models
-	return nil
+	return tea.EnterAltScreen
 }
 
 func (m Page) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
-		cmd tea.Cmd
+		cmd  tea.Cmd
+		cmds []tea.Cmd
 	)
 	switch msg := msg.(type) {
-
+	case tea.WindowSizeMsg:
+		h, v := docStyle.GetFrameSize()
+		m.list.SetSize(msg.Width-h, msg.Height-v)
+		// m.list, cmd = m.list.Update(msg)
+		return m, cmd
 	case tea.KeyMsg:
+		// Don't match any of the keys below if we're actively filtering.
+		if m.list.FilterState() == list.Filtering {
+			log.Print("filter")
+			m.searching = true
+			break
+		} else {
+			m.searching = false
+		}
 
 		switch {
 
@@ -77,14 +92,14 @@ func (m Page) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.list.SetShowHelp(!m.list.ShowHelp())
 			return m, nil
 		}
-	case tea.WindowSizeMsg:
-		h, v := docStyle.GetFrameSize()
-		m.list.SetSize(msg.Width-h, msg.Height-v)
-		m.list, cmd = m.list.Update(msg)
-		return m, cmd
 
 	}
-	return m, nil
+	// This will also call our delegate's update function.
+	newListModel, cmd := m.list.Update(msg)
+	m.list = newListModel
+	cmds = append(cmds, cmd)
+
+	return m, tea.Batch(cmds...)
 }
 
 func (m Page) View() string {
