@@ -10,6 +10,7 @@ type KeyMap struct {
 	State  key.Binding
 	Search key.Binding
 	Help   key.Binding
+	Status key.Binding
 }
 
 var DefaultKeyMap = KeyMap{
@@ -29,4 +30,5 @@ var DefaultKeyMap = KeyMap{
 	State:  key.NewBinding(key.WithKeys("s"), key.WithHelp("s", "change the state of the app")),
 	Search: key.NewBinding(key.WithKeys("/"), key.WithHelp("/", "search")),
 	Help:   key.NewBinding(key.WithKeys("h"), key.WithHelp("h", "display hides the help menu")),
+	Status: key.NewBinding(key.WithKeys("S"), key.WithHelp("S", "display hides the status")),
 }

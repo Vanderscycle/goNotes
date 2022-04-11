@@ -21,10 +21,10 @@ var (
 )
 
 type Page struct {
+	keymap    keymaps.KeyMap
 	title     string
 	paragraph string
 	list      list.Model
-	keymap    keymaps.KeyMap
 }
 
 func PageInitialModel() Page {
@@ -69,6 +69,10 @@ func (m Page) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.list.SetFilteringEnabled(v)
 			return m, nil
 
+		case key.Matches(msg, m.keymap.Status):
+			m.list.SetShowStatusBar(!m.list.ShowStatusBar())
+			return m, nil
+
 		case key.Matches(msg, m.keymap.Help):
 			m.list.SetShowHelp(!m.list.ShowHelp())
 			return m, nil
@@ -84,6 +88,6 @@ func (m Page) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Page) View() string {
-	s := lipgloss.JoinVertical(lipgloss.Center, title.Render(m.title), paragraph.Render(m.paragraph), docStyle.Render(m.list.View()))
+	s := docStyle.Render(m.list.View())
 	return s
 }

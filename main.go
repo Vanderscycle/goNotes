@@ -107,7 +107,7 @@ func initialModel() model {
 		index:    indexPage.PageInitialModel(),
 		keymap:   keymaps.DefaultKeyMap,
 		err:      nil,
-		state:    "home",
+		state:    "cmd",
 		list:     telescope.PageInitialModel(),
 		quitting: false,
 	}
